@@ -1,0 +1,44 @@
+{
+    "coord": {
+        "lon": -36.5,
+        "lat": -7.25
+    },
+    "weather": [
+        {
+            "id": 804,
+            "main": "Clouds",
+            "description": "overcast clouds",
+            "icon": "04d"
+        }
+    ],
+    "base": "stations",
+    "main": {
+        "temp": 27.54,
+        "feels_like": 27.8,
+        "temp_min": 27.54,
+        "temp_max": 27.54,
+        "pressure": 1013,
+        "humidity": 48,
+        "sea_level": 1013,
+        "grnd_level": 955
+    },
+    "visibility": 10000,
+    "wind": {
+        "speed": 5.76,
+        "deg": 121,
+        "gust": 5.83
+    },
+    "clouds": {
+        "all": 98
+    },
+    "dt": 1770917679,
+    "sys": {
+        "country": "BR",
+        "sunrise": 1770884987,
+        "sunset": 1770929452
+    },
+    "timezone": -10800,
+    "id": 3393098,
+    "name": "Paraíba",
+    "cod": 200
+}
