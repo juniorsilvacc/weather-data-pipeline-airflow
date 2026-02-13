@@ -1,4 +1,4 @@
-from src.extract_data import extract_weather_data
+from extract.extract_data import extract_weather_data
 
 api_key = '747d68e78f13be9bc807ee19e4c18f84'
 url = f'https://api.openweathermap.org/data/2.5/weather?q=Paraiba,BR&units=metric&appid={api_key}'

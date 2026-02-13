@@ -38,5 +38,5 @@ def save_to_bronze(data: Dict, output_path: str) -> None:
 def extract_weather_data(url: str) -> Dict:
     """Orquestra o processo de extração."""
     data = get_data(url)
-    save_to_bronze(data, "data/bronze/weather_data.json")
+    save_to_bronze(data, "data/bronze/weather_data_raw.json")
     return data
