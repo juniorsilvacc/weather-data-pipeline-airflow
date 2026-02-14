@@ -237,11 +237,11 @@ def transform_data() -> pd.DataFrame:
     df = remove_duplicates(df)
 
     # Criar pasta silver se não existir
-    SILVER_PATH.parent.mkdir(parents=True, exist_ok=True)
+    #SILVER_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     # Salvar em Parquet
-    df.to_parquet(SILVER_PATH, index=False)
+    #df.to_parquet(SILVER_PATH, index=False)
 
-    logging.info(f"Arquivo Silver salvo em {SILVER_PATH}")
+    #logging.info(f"Arquivo Silver salvo em {SILVER_PATH}")
     logging.info("Transformações concluídas ✅")
     return df
