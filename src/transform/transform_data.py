@@ -8,7 +8,8 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-FILE_PATH = Path("data/bronze/weather_data.json")
+FILE_PATH = Path("data/bronze/weather_data_raw.json")
+SILVER_PATH = Path("data/silver/weather_data.parquet")
 
 # Colunas que serão dropadas, após tratamento
 COLUMNS_TO_DROP = ["weather", "weather_icon", "sys.type"]
@@ -132,5 +133,12 @@ def transform_data() -> pd.DataFrame:
     df = rename_columns(df)
     df = convert_datetime(df)
 
+    # Criar pasta silver se não existir
+    SILVER_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+    # Salvar em Parquet
+    df.to_parquet(SILVER_PATH, index=False)
+
+    logging.info(f"Arquivo Silver salvo em {SILVER_PATH}")
     logging.info("Transformações concluídas ✅")
     return df
