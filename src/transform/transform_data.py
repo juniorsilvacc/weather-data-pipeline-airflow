@@ -3,6 +3,22 @@ from pathlib import Path
 import json
 import logging
 
+# -- Etapas --
+# ✅ Normalização
+# ✅ Rename
+# ✅ Drop de colunas
+# ✅ Conversão de datetime
+# ✅ Enforce de tipos
+# ✅ Tratamento de nulos
+# ✅ Deduplicação
+# ✅ Colunas derivadas
+# ✅ Validação de schema
+# ✅ Logs mais informativos
+
+# ==========================
+# CONFIGURAÇÕES
+# ==========================
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
@@ -46,6 +62,23 @@ COLUMNS_TO_RENAME = {
 
 # Colunas que são timestamps Unix e precisam virar datetime
 DATETIME_COLUMNS = ["datetime", "sunrise", "sunset"]
+
+# Colunas obrigatórias para validação
+REQUIRED_COLUMNS = ["temperature", "humidity", "datetime", "city_id"]
+
+# Tipos esperados para otimização e padronização
+DTYPE_MAP = {
+    "temperature": "float32",
+    "feels_like": "float32",
+    "temp_min": "float32",
+    "temp_max": "float32",
+    "humidity": "int16",
+    "pressure": "int32",
+    "clouds": "int16",
+    "wind_speed": "float32",
+    "wind_gust": "float32",
+    "visibility": "int32",
+}
 
 def create_dataframe(path: Path) -> pd.DataFrame:
     """
@@ -121,6 +154,69 @@ def convert_datetime(df: pd.DataFrame) -> pd.DataFrame:
     logging.info("Colunas datetime convertidas")
     return df
 
+def validate_schema(df: pd.DataFrame):
+    """
+    Verifica se as colunas obrigatórias existem no DataFrame.
+    """
+    missing = [col for col in REQUIRED_COLUMNS if col not in df.columns]
+
+    if missing:
+        raise ValueError(f"Colunas obrigatórias ausentes: {missing}")
+
+    logging.info("Schema validado com sucesso")
+
+def enforce_dtypes(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Aplica tipos de dados padronizados para otimização.
+    """
+    for col, dtype in DTYPE_MAP.items():
+        if col in df.columns:
+            df[col] = df[col].astype(dtype)
+
+    logging.info("Tipos de dados aplicados")
+    return df
+
+def handle_nulls(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Trata valores nulos em colunas específicas.
+    """
+    if "wind_gust" in df.columns:
+        df["wind_gust"] = df["wind_gust"].fillna(0)
+
+    if "sea_level" in df.columns and "pressure" in df.columns:
+        df["sea_level"] = df["sea_level"].fillna(df["pressure"])
+
+    logging.info("Tratamento de valores nulos aplicado")
+    return df
+
+def create_derived_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cria colunas derivadas para facilitar análises futuras.
+    """
+    # Converter Kelvin para Celsius (caso API esteja em Kelvin)
+    if "temperature" in df.columns:
+        df["temperature_c"] = df["temperature"] - 273.15
+
+    # Criar colunas de data e hora
+    if "datetime" in df.columns:
+        df["date"] = df["datetime"].dt.date
+        df["hour"] = df["datetime"].dt.hour
+
+    logging.info("Colunas derivadas criadas")
+    return df
+
+def remove_duplicates(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Remove registros duplicados com base na cidade e datetime.
+    """
+    if "city_id" in df.columns and "datetime" in df.columns:
+        before = len(df)
+        df = df.drop_duplicates(subset=["city_id", "datetime"])
+        after = len(df)
+        logging.info(f"Removidos {before - after} registros duplicados")
+
+    return df
+
 def transform_data() -> pd.DataFrame:
     """
     Executa todas as transformações da camada Bronze para Silver.
@@ -132,6 +228,13 @@ def transform_data() -> pd.DataFrame:
     df = drop_columns(df)
     df = rename_columns(df)
     df = convert_datetime(df)
+    
+    validate_schema(df)
+    
+    df = enforce_dtypes(df)
+    df = handle_nulls(df)
+    df = create_derived_columns(df)
+    df = remove_duplicates(df)
 
     # Criar pasta silver se não existir
     SILVER_PATH.parent.mkdir(parents=True, exist_ok=True)
