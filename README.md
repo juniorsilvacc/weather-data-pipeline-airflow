@@ -121,6 +121,5 @@ pip install -r requirements.txt
 python3 src/main.py
 ```
 
-👨‍💻 Autor
-
-Projeto desenvolvido por Junior Silva
+### 👷 Autor
+[Linkedin](https://www.linkedin.com/in/juniiorsilvadev/) 
